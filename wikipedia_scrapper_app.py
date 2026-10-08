@@ -4,7 +4,11 @@ from bs4 import BeautifulSoup ## to parse html
 import wikipedia
 import logging
 
+# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Set user agent globally for the wikipedia library to prevent API blocks and JSONDecodeErrors
+wikipedia.set_user_agent("WikiScraperApp/1.0 (https://github.com/yourusername/wikiscraper; contact@example.com)")
 
 def get_wikipedia_url(search_term):
   try:
@@ -55,25 +59,24 @@ def get_wikipedia_content(url, max_words=1000):
   except Exception as e:
       logging.error(f"An unexpected error occurred: {e}")
       return None
-  def main():
-    st.set_page_config(page_title="Wikipedia Scraper", layout="centered")
-    st.title("Wikipedia Content Scraper")
-    search_term = st.text_input("Enter a search term for Wikipedia:")
-    if search_term:
-      with st.spinner("Scraping Wikipedia..."):
-        url=get_wikipedia_url(search_term)
-        if url:
-          content=get_wikipedia_content(url)
-        if content and not content.startswith("Error:"):
-          st.subheader("Scraped Content:")
-          st.text_area("Extracted content: ",value=content, height=500)
-        elif content.startswith("Error:"):
-          st.error(content)
-        else:
-          st.warning("No content found on the Wikipedia page.")
-          
-  if __name__=="__main__":
-    main()
-    
 
-  
+def main():
+  st.set_page_config(page_title="Wikipedia Scraper", layout="centered")
+  st.title("Wikipedia Content Scraper")
+  search_term = st.text_input("Enter a search term for Wikipedia:")
+  if search_term:
+    with st.spinner("Scraping Wikipedia..."):
+      content = None
+      url=get_wikipedia_url(search_term)
+      if url:
+        content=get_wikipedia_content(url)
+      if content and not content.startswith("Error:"):
+        st.subheader("Scraped Content:")
+        st.text_area("Extracted content: ",value=content, height=500)
+      elif content and content.startswith("Error:"):
+        st.error(content)
+      else:
+        st.warning("No content found on the Wikipedia page.")
+        
+if __name__=="__main__":
+  main()
